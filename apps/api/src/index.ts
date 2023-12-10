@@ -1,7 +1,9 @@
-import express, { NextFunction, Request, Response } from 'express';
+import 'dotenv/config';
+import express from 'express';
 
-import { healthRouter, helloRouter } from './routes';
+import { healthRouter, helloRouter, meRouter } from './routes';
 
+const port = process.env.PORT || 3000;
 const app = express();
 
 app.use((_, res, next) => {
@@ -9,7 +11,13 @@ app.use((_, res, next) => {
   next();
 });
 
-app.use('/', helloRouter);
-app.use('/', healthRouter);
+app.use('/hello', helloRouter);
+app.use('/health', healthRouter);
+app.use('/auth', meRouter);
 
-app.listen(3000, () => console.log('🚀 Listening on http://localhost:3000'));
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(401);
+});
+
+app.listen(port, () => console.log(`🚀 Listening on http://localhost:${port}`));
