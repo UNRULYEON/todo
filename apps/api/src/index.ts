@@ -17,7 +17,7 @@ app.use('/auth', meRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(401);
+  return res.sendStatus(401);
 });
 
 app.listen(port, () => console.log(`🚀 Listening on http://localhost:${port}`));
