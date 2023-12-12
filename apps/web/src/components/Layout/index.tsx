@@ -8,6 +8,7 @@ import {
   ArchiveIcon,
   Settings2Icon,
 } from 'lucide-react';
+import { ThemeToggle } from '@/components';
 
 type NavItem = {
   label: string;
@@ -45,13 +46,13 @@ const navItems: NavItem[] = [
 
 const Layout: FC = () => {
   return (
-    <main className="dark:bg-stone-900 bg-stone-300 text-foreground w-full h-full flex flex-row">
-      <div className="w-full max-w-[200px] m-3 mr-0 flex flex-col gap-3">
+    <main className="bg-neutral-100 dark:bg-neutral-950 w-full h-full flex flex-row">
+      <div className="relative w-full max-w-[200px] m-3 mr-0 flex flex-col gap-3">
         <span className="h-11 flex items-center px-2 font-bold gap-2 select-none">
           <span>🎯</span>
           <span>Todo</span>
         </span>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 grow">
           {navItems.map((item) => (
             <NavLink
               to={item.to}
@@ -59,8 +60,8 @@ const Layout: FC = () => {
               className={({ isActive }) =>
                 `flex flex-row gap-2 items-center rounded-sm p-2 transition-all ${
                   isActive
-                    ? 'bg-stone-100/5 text-foreground/100'
-                    : 'text-foreground/60'
+                    ? 'dark:bg-neutral-100/5 bg-neutral-900/5 text-foreground/100'
+                    : 'dark:text-foreground/60 text-foreground/70'
                 }`
               }
             >
@@ -71,8 +72,11 @@ const Layout: FC = () => {
             </NavLink>
           ))}
         </div>
+        <div className="">
+          <ThemeToggle />
+        </div>
       </div>
-      <div className="dark:bg-stone-800 m-3 p-3 rounded-xl w-full">
+      <div className="dark:bg-neutral-900 bg-neutral-50 border m-3 p-3 rounded-xl w-full">
         <Outlet />
       </div>
     </main>
