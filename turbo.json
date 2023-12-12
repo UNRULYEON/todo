@@ -16,6 +16,10 @@
     "prisma:generate": {
       "dependsOn": ["^prisma:generate"],
       "cache": false
+    },
+    "prisma:migrate:dev": {
+      "dependsOn": ["^prisma:migrate:dev"],
+      "cache": false
     }
   }
 }

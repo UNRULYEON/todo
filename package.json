@@ -6,7 +6,8 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prisma:generate": "turbo run prisma:generate"
+    "prisma:generate": "turbo run prisma:generate",
+    "prisma:migrate:dev": "turbo run prisma:migrate:dev"
   },
   "devDependencies": {
     "prettier": "^3.1.0",
