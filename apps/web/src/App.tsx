@@ -5,13 +5,14 @@ import {
   SignedIn,
   SignedOut,
 } from '@clerk/clerk-react';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { Layout } from '@/components';
 import './App.css';
 
 const Guard = () => (
   <>
     <SignedIn>
-      <Outlet />
+      <Layout />
     </SignedIn>
     <SignedOut>
       <RedirectToSignIn />
@@ -32,6 +33,10 @@ const App = () => {
       />
       <Route path="/" element={<Guard />}>
         <Route path="/" element={<div>hello world</div>} />
+        <Route path="/inbox" element={<div>hello inbox</div>} />
+        <Route path="/backlog" element={<div>hello backlog</div>} />
+        <Route path="/archive" element={<div>hello archive</div>} />
+        <Route path="/settings" element={<div>hello settings</div>} />
       </Route>
     </Routes>
   );
