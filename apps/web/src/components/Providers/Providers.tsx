@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
+import { ThemeProvider } from '@/components';
 
 if (!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key');
@@ -18,7 +19,9 @@ const Providers = ({ children }: ProvidersProps) => {
       publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
       navigate={(to) => navigate(to)}
     >
-      {children}
+      <ThemeProvider defaultTheme="dark" storageKey="todo">
+        {children}
+      </ThemeProvider>
     </ClerkProvider>
   );
 };
