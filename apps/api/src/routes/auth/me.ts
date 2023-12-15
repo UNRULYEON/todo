@@ -5,6 +5,20 @@ import db from 'db';
 const router: Router = express.Router();
 
 router.get('/me', ClerkExpressRequireAuth(), async (req, res) => {
+  let user = await db.user.findUnique({
+    where: {
+      id: req.auth.userId,
+    },
+  });
+
+  if (!user) {
+    user = await db.user.create({
+      data: {
+        id: req.auth.userId,
+      },
+    });
+  }
+
   const lanes = await db.lane.findMany({
     where: {
       userId: req.auth.userId,
@@ -13,7 +27,9 @@ router.get('/me', ClerkExpressRequireAuth(), async (req, res) => {
 
   res.json({
     id: req.auth.userId,
-    lanes: lanes,
+    onboarded: user.onboarded,
+    hasSeenOnboarding: user.hasSeenOnboarding,
+    lanes: lanes.length,
   });
 });
 

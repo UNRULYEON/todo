@@ -11,9 +11,9 @@ app.use((_, res, next) => {
   next();
 });
 
-app.use('/hello', helloRouter);
-app.use('/health', healthRouter);
-app.use('/auth', meRouter);
+app.use('/api/hello', helloRouter);
+app.use('/api/health', healthRouter);
+app.use('/api/auth', meRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
