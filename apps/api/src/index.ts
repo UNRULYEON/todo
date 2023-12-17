@@ -6,6 +6,11 @@ import { healthRouter, helloRouter, meRouter } from './routes';
 const port = process.env.PORT || 3000;
 const app = express();
 
+app.enable('trust proxy');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 app.use((_, res, next) => {
   res.setHeader('x-powered-by', 'your mom :)');
   next();
