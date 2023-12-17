@@ -47,8 +47,6 @@ router.patch(
   ClerkExpressRequireAuth(),
   validate(updateUserSchema),
   async (req, res) => {
-    console.log(req.body);
-
     const existingUser = await db.user.findUnique({
       where: {
         id: req.params.id,
