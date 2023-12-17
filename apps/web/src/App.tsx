@@ -1,24 +1,7 @@
-import {
-  RedirectToSignIn,
-  SignIn,
-  SignUp,
-  SignedIn,
-  SignedOut,
-} from '@clerk/clerk-react';
+import { SignIn, SignUp } from '@clerk/clerk-react';
 import { Route, Routes } from 'react-router-dom';
-import { Layout } from '@/components';
+import { Guard } from '@/components';
 import './App.css';
-
-const Guard = () => (
-  <>
-    <SignedIn>
-      <Layout />
-    </SignedIn>
-    <SignedOut>
-      <RedirectToSignIn />
-    </SignedOut>
-  </>
-);
 
 const App = () => {
   return (
