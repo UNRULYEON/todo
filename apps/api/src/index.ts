@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 
-import { healthRouter, helloRouter, meRouter } from './routes';
+import { healthRouter, helloRouter, meRouter, laneRouter } from './routes';
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -19,6 +19,7 @@ app.use((_, res, next) => {
 app.use('/api/hello', helloRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/auth', meRouter);
+app.use('/api/lanes', laneRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
