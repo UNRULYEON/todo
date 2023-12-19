@@ -26,7 +26,7 @@ model Lane {
   color String?
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   Task   Task[]
 }
 
@@ -38,7 +38,7 @@ model Task {
   subtasks    Subtask[]
 
   laneId String
-  lane   Lane   @relation(fields: [laneId], references: [id])
+  lane   Lane   @relation(fields: [laneId], references: [id], onDelete: Cascade)
 }
 
 model Subtask {
@@ -47,5 +47,5 @@ model Subtask {
   title String
 
   taskId String
-  task   Task   @relation(fields: [taskId], references: [id])
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
