@@ -18,7 +18,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    label: 'Kanban board',
+    label: 'Board',
     icon: LayoutDashboardIcon,
     to: '/',
   },
