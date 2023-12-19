@@ -1,12 +1,12 @@
 import express, { Router } from 'express';
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import { z } from 'zod';
-import db, { User } from 'db';
+import db from 'db';
 import { validate } from '../../middleware';
 
 const router: Router = express.Router();
 
-router.get('/me', ClerkExpressRequireAuth(), async (req, res) => {
+router.get('/', ClerkExpressRequireAuth(), async (req, res) => {
   let user = await db.user.findUnique({
     where: {
       id: req.auth.userId,
@@ -43,13 +43,13 @@ const updateUserSchema = z
   .partial();
 
 router.patch(
-  '/user/:id',
+  '',
   ClerkExpressRequireAuth(),
   validate(updateUserSchema),
   async (req, res) => {
     const existingUser = await db.user.findUnique({
       where: {
-        id: req.params.id,
+        id: req.auth.userId,
       },
     });
 
