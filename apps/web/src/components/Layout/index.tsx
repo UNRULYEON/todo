@@ -3,9 +3,9 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
   LucideIcon,
   LayoutDashboardIcon,
-  InboxIcon,
-  FolderIcon,
-  ArchiveIcon,
+  // InboxIcon,
+  // FolderIcon,
+  // ArchiveIcon,
   Settings2Icon,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components';
@@ -22,21 +22,21 @@ const navItems: NavItem[] = [
     icon: LayoutDashboardIcon,
     to: '/',
   },
-  {
-    label: 'Inbox',
-    icon: InboxIcon,
-    to: '/inbox',
-  },
-  {
-    label: 'Backlog',
-    icon: FolderIcon,
-    to: '/backlog',
-  },
-  {
-    label: 'Archive',
-    icon: ArchiveIcon,
-    to: '/archive',
-  },
+  // {
+  //   label: 'Inbox',
+  //   icon: InboxIcon,
+  //   to: '/inbox',
+  // },
+  // {
+  //   label: 'Backlog',
+  //   icon: FolderIcon,
+  //   to: '/backlog',
+  // },
+  // {
+  //   label: 'Archive',
+  //   icon: ArchiveIcon,
+  //   to: '/archive',
+  // },
   {
     label: 'Settings',
     icon: Settings2Icon,
