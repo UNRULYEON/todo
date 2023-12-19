@@ -9,7 +9,6 @@ type User = {
 };
 
 export const update = (
-  id?: string,
   options?: Partial<
     Parameters<typeof useMutation<User, Error, Partial<User>, unknown>>[0]
   >
@@ -20,9 +19,9 @@ export const update = (
     Partial<User>,
     unknown
   >({
-    mutationKey: ['update-user', id],
+    mutationKey: ['update-user'],
     mutationFn: (updatedUser) =>
-      axios.patch(`/api/auth/user/${id}`, updatedUser).then((res) => res.data),
+      axios.patch(`/api/user`, updatedUser).then((res) => res.data),
     ...options,
   });
 

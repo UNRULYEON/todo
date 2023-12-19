@@ -12,9 +12,7 @@ import { Button } from '@/components/ui/button';
 
 const Onboarding: FC = () => {
   const { user, getUser, isLoadingUser } = useUser.get();
-  const { updateUser, isUpdatingUser, errorUpdatingUser } = useUser.update(
-    user?.id
-  );
+  const { updateUser, isUpdatingUser, errorUpdatingUser } = useUser.update();
   const { createLane } = useLane.create();
 
   useEffect(() => {

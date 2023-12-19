@@ -13,7 +13,7 @@ export const get = (
 ) => {
   const { data, isLoading, error, refetch } = useQuery<User>({
     queryKey: ['user'],
-    queryFn: () => axios.get('/api/auth/me').then((res) => res.data),
+    queryFn: () => axios.get('/api/user').then((res) => res.data),
     ...options,
   });
 
