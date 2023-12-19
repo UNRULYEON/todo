@@ -22,7 +22,8 @@ model User {
 model Lane {
   id String @id @default(uuid())
 
-  name String
+  name  String
+  color String?
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
