@@ -4,18 +4,21 @@ import { axios } from '@/api';
 type Lane = {
   id: string;
   name: string;
+  color: string;
 };
+
+type UpdateLane = Omit<Lane, 'id'>;
 
 export const update = (
   id?: string,
   options?: Partial<
-    Parameters<typeof useMutation<Lane, Error, Partial<Lane>, unknown>>[0]
+    Parameters<typeof useMutation<Lane, Error, Partial<UpdateLane>, unknown>>[0]
   >
 ) => {
   const { mutateAsync, isPending, isError } = useMutation<
     Lane,
     Error,
-    Partial<Lane>,
+    Partial<UpdateLane>,
     unknown
   >({
     mutationKey: ['lane', id],

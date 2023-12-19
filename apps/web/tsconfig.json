@@ -23,7 +23,8 @@
     /* Alias imports */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/utils": ["./src/utils/index.ts"]
     }
   },
   "include": ["src"],

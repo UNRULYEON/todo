@@ -4,11 +4,10 @@ import { axios } from '@/api';
 type Lane = {
   id: string;
   name: string;
+  color: string;
 };
 
-type NewLane = {
-  name: string;
-};
+type NewLane = Omit<Lane, 'id'>;
 
 export const create = (
   options?: Partial<

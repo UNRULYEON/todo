@@ -60,8 +60,8 @@ const Layout: FC = () => {
               className={({ isActive }) =>
                 `flex flex-row gap-2 items-center rounded-sm p-2 transition-all ${
                   isActive
-                    ? 'dark:bg-neutral-100/5 bg-neutral-900/5 text-foreground/100'
-                    : 'dark:text-foreground/60 text-foreground/70'
+                    ? 'dark:bg-neutral-100/5 bg-neutral-900/5 text-foreground/100 border'
+                    : 'dark:text-foreground/60 text-foreground/70 border border-transparent'
                 }`
               }
             >

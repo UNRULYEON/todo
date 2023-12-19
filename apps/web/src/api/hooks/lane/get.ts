@@ -4,6 +4,7 @@ import { axios } from '@/api';
 type Lane = {
   id: string;
   name: string;
+  color: string;
 };
 
 export const get = (

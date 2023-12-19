@@ -6,28 +6,30 @@ import { validate } from '../../middleware';
 
 const router: Router = express.Router();
 
-router.get('/', ClerkExpressRequireAuth(), (req, res) => {
-  const lanes = db.lane.findMany({
+router.get('/', ClerkExpressRequireAuth(), async (req, res) => {
+  const lanes = await db.lane.findMany({
     where: {
       userId: req.auth.userId,
     },
     select: {
       id: true,
       name: true,
+      color: true,
     },
   });
 
   return res.json(lanes);
 });
 
-router.get('/:id', ClerkExpressRequireAuth(), (req, res) => {
-  const lane = db.lane.findUnique({
+router.get('/:id', ClerkExpressRequireAuth(), async (req, res) => {
+  const lane = await db.lane.findUnique({
     where: {
       id: req.params.id,
     },
     select: {
       id: true,
       name: true,
+      color: true,
     },
   });
 
@@ -36,6 +38,7 @@ router.get('/:id', ClerkExpressRequireAuth(), (req, res) => {
 
 const createLaneSchema = z.object({
   name: z.string(),
+  color: z.string(),
 });
 
 router.post(
@@ -46,6 +49,7 @@ router.post(
     const newLane = await db.lane.create({
       data: {
         name: req.body.name,
+        color: req.body.color,
         user: {
           connect: {
             id: req.auth.userId,
@@ -61,6 +65,7 @@ router.post(
 const updateLaneSchema = z
   .object({
     name: z.string(),
+    color: z.string(),
   })
   .partial();
 

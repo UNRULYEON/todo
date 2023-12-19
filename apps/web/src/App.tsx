@@ -1,6 +1,7 @@
 import { SignIn, SignUp } from '@clerk/clerk-react';
 import { Route, Routes } from 'react-router-dom';
 import { Guard } from '@/components';
+import { RootPage } from '@/pages';
 import './App.css';
 
 const App = () => {
@@ -15,7 +16,7 @@ const App = () => {
         element={<SignUp routing="path" path="/sign-up" />}
       />
       <Route path="/" element={<Guard />}>
-        <Route path="/" element={<div>hello world</div>} />
+        <Route path="/" element={<RootPage />} />
         <Route path="/inbox" element={<div>hello inbox</div>} />
         <Route path="/backlog" element={<div>hello backlog</div>} />
         <Route path="/archive" element={<div>hello archive</div>} />

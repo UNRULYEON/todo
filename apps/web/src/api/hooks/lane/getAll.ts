@@ -4,6 +4,7 @@ import { axios } from '@/api';
 type Lane = {
   id: string;
   name: string;
+  color: string;
 };
 
 export const getAll = (
@@ -11,7 +12,7 @@ export const getAll = (
 ) => {
   const { data, isLoading, error, refetch } = useQuery<Lane[]>({
     queryKey: ['lanes'],
-    queryFn: () => axios.get(`/api/lanes/`).then((res) => res.data),
+    queryFn: () => axios.get(`/api/lanes`).then((res) => res.data),
     ...options,
   });
 

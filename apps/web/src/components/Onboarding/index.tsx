@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { useLane, useUser } from '@/api';
+import { queryClient, useLane, useUser } from '@/api';
 import { Button } from '@/components/ui/button';
 
 const Onboarding: FC = () => {
@@ -32,20 +32,26 @@ const Onboarding: FC = () => {
 
   const createDefaultLanes = () => {
     [
-      'Todo',
-      'In progress',
-      'Done',
-      'This Sprint',
-      'Backlog',
-      'Archive',
-    ].forEach((name) =>
+      ['Todo', '#A855F7'],
+      ['In progress', '#3B82F6'],
+      ['Done', '#22C55E'],
+      ['This sprint', '#FB923C'],
+      ['Backlog', '#FFF'],
+      ['Archive', '#FFF'],
+    ].forEach(([name, color]) =>
       createLane(
-        { name },
+        { name, color },
         {
-          onSuccess: () =>
+          onSuccess: () => {
             updateUser({ hasSeenOnboarding: true, onboarded: true }).then(() =>
-              getUser()
+              queryClient.invalidateQueries({
+                queryKey: ['user'],
+              })
             ),
+              queryClient.invalidateQueries({
+                queryKey: ['lanes'],
+              });
+          },
         }
       )
     );
