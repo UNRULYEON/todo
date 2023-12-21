@@ -4,6 +4,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/utils';
 import { buttonVariants } from '@/components/ui/button';
 import SettingsAccountPage from './account';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 // import SettingsBillingPage from './billing';
 
 // const SettingsProfilePage = () => {
@@ -44,9 +46,18 @@ const SettingsPage = () => {
 
   return (
     <div className="flex flex-col gap-8 h-full">
-      <span className="font-extrabold text-4xl">
-        :D {user?.firstName} {user?.lastName}
-      </span>
+      <div className="flex flex-row gap-3 items-center">
+        <Avatar>
+          <AvatarImage src={user?.imageUrl} />
+          <AvatarFallback>
+            {user?.firstName?.charAt(0)}
+            {user?.lastName?.charAt(0)}
+          </AvatarFallback>
+        </Avatar>
+        <span className="font-extrabold text-3xl">
+          {user?.firstName} {user?.lastName}
+        </span>
+      </div>
       <div className="flex flex-row gap-8">
         <div className="flex flex-col space-x-0 space-y-1 min-w-[200px]">
           {settingsItem.map((item) => (
