@@ -75,4 +75,34 @@ router.patch(
   }
 );
 
+router.get('/reset', ClerkExpressRequireAuth(), async (req, res) => {
+  await db.lane.deleteMany({
+    where: {
+      userId: req.auth.userId,
+    },
+  });
+
+  await db.user.update({
+    where: {
+      id: req.auth.userId,
+    },
+    data: {
+      onboarded: false,
+      hasSeenOnboarding: false,
+    },
+  });
+
+  res.sendStatus(200);
+});
+
+router.get('/delete', ClerkExpressRequireAuth(), async (req, res) => {
+  await db.user.delete({
+    where: {
+      id: req.auth.userId,
+    },
+  });
+
+  res.sendStatus(200);
+});
+
 export default router;

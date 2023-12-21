@@ -52,7 +52,7 @@ const Layout: FC = () => {
           <span>🎯</span>
           <span>Todo</span>
         </span>
-        <div className="flex flex-col gap-2 grow">
+        <nav className="flex flex-col gap-2 grow">
           {navItems.map((item) => (
             <NavLink
               to={item.to}
@@ -71,12 +71,12 @@ const Layout: FC = () => {
               <span>{item.label}</span>
             </NavLink>
           ))}
-        </div>
+        </nav>
         <div className="">
           <ThemeToggle />
         </div>
       </div>
-      <div className="dark:bg-neutral-900 bg-neutral-50 border m-3 p-3 rounded-xl w-full">
+      <div className="dark:bg-neutral-900 bg-neutral-50 border m-3 p-4 rounded-xl w-full">
         <Outlet />
       </div>
     </main>

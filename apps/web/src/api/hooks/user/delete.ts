@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { axios } from '@/api';
 
-export const deleteLane = (
-  id?: string,
+export const deleteUser = (
   options?: Partial<
     Parameters<typeof useMutation<void, Error, void, unknown>>[0]
   >
@@ -13,14 +12,14 @@ export const deleteLane = (
     void,
     unknown
   >({
-    mutationKey: ['lane', id],
-    mutationFn: () => axios.delete(`/api/lanes/${id}`).then((res) => res.data),
+    mutationKey: ['delete-user'],
+    mutationFn: () => axios.get(`/api/user/delete`).then((res) => res.data),
     ...options,
   });
 
   return {
-    deleteLane: mutateAsync,
-    isDeletingLane: isPending,
-    errorDeletingLane: isError,
+    deleteUser: mutateAsync,
+    isDeletingUser: isPending,
+    errorDeletingUser: isError,
   };
 };
