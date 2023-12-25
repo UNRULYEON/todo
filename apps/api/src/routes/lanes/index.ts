@@ -25,6 +25,7 @@ router.get('/:id', ClerkExpressRequireAuth(), async (req, res) => {
   const lane = await db.lane.findUnique({
     where: {
       id: req.params.id,
+      userId: req.auth.userId,
     },
     select: {
       id: true,
@@ -34,6 +35,23 @@ router.get('/:id', ClerkExpressRequireAuth(), async (req, res) => {
   });
 
   return res.json(lane);
+});
+
+router.get('/:id/tasks', ClerkExpressRequireAuth(), async (req, res) => {
+  const tasks = await db.task.findMany({
+    where: {
+      laneId: req.params.id,
+      lane: {
+        userId: req.auth.userId,
+      },
+    },
+    select: {
+      id: true,
+      previousTaskId: true,
+    },
+  });
+
+  return res.json(tasks);
 });
 
 const createLaneSchema = z.object({
@@ -77,6 +95,7 @@ router.patch(
     const existingLane = await db.lane.findUnique({
       where: {
         id: req.params.id,
+        userId: req.auth.userId,
       },
     });
 
@@ -85,6 +104,7 @@ router.patch(
     const lane = await db.lane.update({
       where: {
         id: req.params.id,
+        userId: req.auth.userId,
       },
       data: {
         ...existingLane,
@@ -102,6 +122,7 @@ router.delete('/:id', ClerkExpressRequireAuth(), async (req, res) => {
   const existingLane = await db.lane.findUnique({
     where: {
       id: req.params.id,
+      userId: req.auth.userId,
     },
   });
 
@@ -110,6 +131,7 @@ router.delete('/:id', ClerkExpressRequireAuth(), async (req, res) => {
   await db.lane.delete({
     where: {
       id: req.params.id,
+      userId: req.auth.userId,
     },
   });
 

@@ -33,9 +33,10 @@ model Lane {
 model Task {
   id String @id @default(uuid())
 
-  title       String
-  description String?
-  subtasks    Subtask[]
+  title          String
+  description    String?
+  subtasks       Subtask[]
+  previousTaskId String?   @unique
 
   laneId String
   lane   Lane   @relation(fields: [laneId], references: [id], onDelete: Cascade)

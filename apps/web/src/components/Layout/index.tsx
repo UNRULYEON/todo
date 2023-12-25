@@ -76,7 +76,7 @@ const Layout: FC = () => {
           <ThemeToggle />
         </div>
       </div>
-      <div className="dark:bg-neutral-900 bg-neutral-50 border m-3 p-4 rounded-xl w-full">
+      <div className="flex dark:bg-neutral-900 bg-neutral-50 border m-3 p-4 rounded-xl w-full">
         <Outlet />
       </div>
     </main>

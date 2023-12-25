@@ -1,28 +1,23 @@
 import { useMutation } from '@tanstack/react-query';
 import { axios } from '@/api';
+import { LaneType } from '@/types';
 
-type Lane = {
-  id: string;
-  name: string;
-  color: string;
-};
-
-type NewLane = Omit<Lane, 'id'>;
+type NewLane = Omit<LaneType, 'id'>;
 
 export const create = (
   options?: Partial<
-    Parameters<typeof useMutation<Lane, Error, NewLane, unknown>>[0]
+    Parameters<typeof useMutation<LaneType, Error, NewLane, unknown>>[0]
   >
 ) => {
   const { mutateAsync, isPending, isError } = useMutation<
-    Lane,
+    LaneType,
     Error,
     NewLane,
     unknown
   >({
     mutationKey: ['create-lane'],
-    mutationFn: (updatedUser) =>
-      axios.post(`/api/lanes/`, updatedUser).then((res) => res.data),
+    mutationFn: (newLane) =>
+      axios.post(`/api/lanes/`, newLane).then((res) => res.data),
     ...options,
   });
 
