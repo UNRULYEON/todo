@@ -1,7 +1,7 @@
 import { ReactNode, Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
-import { ThemeProvider } from '@/components';
+import { LanesProvider, ThemeProvider } from '@/components';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/api';
 import { Environment } from '@/constants';
@@ -32,22 +32,24 @@ const Providers = ({ children }: ProvidersProps) => {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ClerkProvider
-        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-        navigate={(to) => navigate(to)}
-      >
-        <ThemeProvider defaultTheme="dark" storageKey="todo">
-          {children}
-        </ThemeProvider>
-      </ClerkProvider>
+    <LanesProvider>
+      <QueryClientProvider client={queryClient}>
+        <ClerkProvider
+          publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+          navigate={(to) => navigate(to)}
+        >
+          <ThemeProvider defaultTheme="dark" storageKey="todo">
+            {children}
+          </ThemeProvider>
+        </ClerkProvider>
 
-      {showDevtools && (
-        <Suspense fallback={null}>
-          <ReactQueryDevtools />
-        </Suspense>
-      )}
-    </QueryClientProvider>
+        {showDevtools && (
+          <Suspense fallback={null}>
+            <ReactQueryDevtools />
+          </Suspense>
+        )}
+      </QueryClientProvider>
+    </LanesProvider>
   );
 };
 

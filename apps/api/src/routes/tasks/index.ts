@@ -89,11 +89,8 @@ router.patch(
 );
 
 const reorderTaskSchema = z.object({
-  targetTaskId: z.string().nullable(),
-  position: z.string().refine(
-    (value) => value === 'before' || value === 'after',
-    (_) => ({ message: 'Position must be either before or after' })
-  ),
+  targetLaneId: z.string(),
+  previousNodeId: z.string().nullable(),
 });
 
 router.post(
@@ -132,40 +129,47 @@ router.post(
       },
     });
 
-    const targetNode = await db.task.findUnique({
-      where: {
-        id: req.body.targetTaskId,
-        lane: {
-          id: node.laneId,
-          userId: req.auth.userId,
-        },
-      },
-    });
-
-    const targetPreviousNode = targetNode.previousTaskId
+    // Get target node
+    const targetNode = req.body.previousNodeId
       ? await db.task.findUnique({
           where: {
-            id: targetNode.previousTaskId,
+            id: req.body.previousNodeId,
             lane: {
+              id: req.body.targetLaneId,
               userId: req.auth.userId,
             },
           },
         })
       : null;
 
-    const targetNextNode = await db.task.findUnique({
-      where: {
-        previousTaskId: targetNode.id,
-        lane: {
-          userId: req.auth.userId,
-        },
-      },
-    });
-
-    console.log(``);
+    // Get targets next node
+    const targetNextNode = targetNode
+      ? await db.task.findUnique({
+          where: {
+            previousTaskId: targetNode.id,
+            lane: {
+              id: req.body.targetLaneId,
+              userId: req.auth.userId,
+            },
+          },
+        })
+      : null;
 
     await db.$transaction(async (tx) => {
-      // Unlink node from previous node
+      console.log('');
+
+      // Get current head node
+      const currentHeadNode = await db.task.findFirst({
+        where: {
+          previousTaskId: null,
+          lane: {
+            id: req.body.targetLaneId,
+            userId: req.auth.userId,
+          },
+        },
+      });
+
+      // Unlink node from previous node if it exists
       if (previousNode !== null) {
         await tx.task.update({
           where: {
@@ -176,10 +180,10 @@ router.post(
           },
         });
 
-        console.log(`Unlinked ${node.id} from ${previousNode.id}`);
+        console.log(`Unlinked ${previousNode.id} from ${node.id}`);
       }
 
-      // Unlink next node from node
+      // Unlink next node from node if it exists
       if (nextNode !== null) {
         await tx.task.update({
           where: {
@@ -190,10 +194,10 @@ router.post(
           },
         });
 
-        console.log(`Unlinked ${nextNode.id} from ${node.id}`);
+        console.log(`Unlinked ${node.id} from ${nextNode.id}`);
       }
 
-      // Link previous node with next node
+      // Link previous node with next node if they both exist
       if (previousNode !== null && nextNode !== null) {
         await tx.task.update({
           where: {
@@ -204,11 +208,55 @@ router.post(
           },
         });
 
-        console.log(`Linked ${nextNode.id} -> ${previousNode.id}`);
+        console.log(`Linked ${previousNode.id} -> ${nextNode.id}`);
       }
 
-      if (targetNextNode === null) {
-        // Set node as tail
+      // Set laneId of node to target lane if it's different
+      if (node.laneId !== req.body.targetLaneId) {
+        await tx.task.update({
+          where: {
+            id: node.id,
+          },
+          data: {
+            laneId: req.body.targetLaneId,
+          },
+        });
+
+        console.log(`Moved ${node.id} to ${req.body.targetLaneId}`);
+      }
+
+      // Link current head node with node if it exists and previousNodeId is null
+      if (currentHeadNode !== null && req.body.previousNodeId === null) {
+        await tx.task.update({
+          where: {
+            id: currentHeadNode.id,
+          },
+          data: {
+            previousTaskId: node.id,
+          },
+        });
+
+        console.log(`Linked ${currentHeadNode.id} -> ${node.id}`);
+
+        return;
+      }
+
+      // Unlink targets next node from target node if it exists
+      if (targetNextNode !== null) {
+        await tx.task.update({
+          where: {
+            id: targetNextNode.id,
+          },
+          data: {
+            previousTaskId: null,
+          },
+        });
+
+        console.log(`Unlinked ${targetNode.id} from ${targetNextNode.id}`);
+      }
+
+      // Link node with target node if it exists
+      if (targetNode !== null) {
         await tx.task.update({
           where: {
             id: node.id,
@@ -218,32 +266,11 @@ router.post(
           },
         });
 
-        console.log(`Set ${node.id} as tail`);
-      } else if (targetPreviousNode === null) {
-        // Set node as head
-        await tx.task.update({
-          where: {
-            id: node.id,
-          },
-          data: {
-            previousTaskId: null,
-          },
-        });
+        console.log(`Linked ${targetNode.id} -> ${node.id}`);
+      }
 
-        await tx.task.update({
-          where: {
-            id: targetNode.id,
-          },
-          data: {
-            previousTaskId: node.id,
-          },
-        });
-
-        console.log(`Set ${node.id} as head`);
-      } else if (node.id === targetNode.previousTaskId) {
-        console.log(`Switching ${node.id} -> ${targetNode.id}`);
-
-        // Link node with target's next node
+      // Link targets next node with node if it exists
+      if (targetNextNode !== null) {
         await tx.task.update({
           where: {
             id: targetNextNode.id,
@@ -253,123 +280,7 @@ router.post(
           },
         });
 
-        console.log(`Linked ${targetNextNode.id} -> ${node.id}`);
-
-        // Set target as previous node of node
-        await tx.task.update({
-          where: {
-            id: node.id,
-          },
-          data: {
-            previousTaskId: targetNode.id,
-          },
-        });
-
-        console.log(`Linked ${node.id} -> ${targetNode.id}`);
-      } else if (targetNode.id === node.previousTaskId) {
-        console.log(`Switching ${node.id} -> ${targetNode.id}`);
-
-        // Set node as previous node of target
-        await tx.task.update({
-          where: {
-            id: targetNode.id,
-          },
-          data: {
-            previousTaskId: node.id,
-          },
-        });
-
-        console.log(`Linked ${targetNode.id} -> ${node.id}`);
-
-        // Link target's previous node with node
-        await tx.task.update({
-          where: {
-            id: node.id,
-          },
-          data: {
-            previousTaskId: targetNode.previousTaskId,
-          },
-        });
-
-        console.log(`Linked ${node.id} -> ${targetNode.previousTaskId}`);
-      } else {
-        if (req.body.position === 'before') {
-          // Set targets previous node to null
-          await tx.task.update({
-            where: {
-              id: targetNode.id,
-            },
-            data: {
-              previousTaskId: null,
-            },
-          });
-
-          console.log(
-            `Unlinked ${targetNode.id} from ${targetNode.previousTaskId}`
-          );
-
-          // Link target node with node
-          await tx.task.update({
-            where: {
-              id: targetNode.id,
-            },
-            data: {
-              previousTaskId: node.id,
-            },
-          });
-
-          console.log(`Linked ${targetNode.id} -> ${node.id}`);
-
-          // Link node with target's previous node
-          await tx.task.update({
-            where: {
-              id: node.id,
-            },
-            data: {
-              previousTaskId: targetPreviousNode.id,
-            },
-          });
-
-          console.log(`Linked ${node.id} -> ${targetPreviousNode.id}`);
-        } else {
-          // Set previous node of targets next node to null
-          await tx.task.update({
-            where: {
-              id: targetNextNode.id,
-            },
-            data: {
-              previousTaskId: null,
-            },
-          });
-
-          console.log(
-            `Unlinked ${targetNextNode.id} from ${targetNextNode.previousTaskId}`
-          );
-
-          // Link targets next node with node
-          await tx.task.update({
-            where: {
-              id: targetNextNode.id,
-            },
-            data: {
-              previousTaskId: node.id,
-            },
-          });
-
-          console.log(`Linked ${targetNextNode.id} -> ${node.id}`);
-
-          // Link node with target node
-          await tx.task.update({
-            where: {
-              id: node.id,
-            },
-            data: {
-              previousTaskId: targetNode.id,
-            },
-          });
-
-          console.log(`Linked ${node.id} -> ${targetNode.id}`);
-        }
+        console.log(`Linked ${node.id} -> ${targetNextNode.id}`);
       }
     });
 

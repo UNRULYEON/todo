@@ -1,32 +1,12 @@
 import { queryClient, useLane, useTask } from '@/api';
-import { Lane, Task } from '@/components';
-import { TaskType } from '@/types';
-import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragStartEvent,
-  DragEndEvent,
-  UniqueIdentifier,
-} from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { Lane, useLanes } from '@/components';
+import { DragDropContext, OnDragEndResponder } from '@hello-pangea/dnd';
+import { useCallback, useEffect, useState } from 'react';
 
 const RootPage = () => {
-  const { lanes } = useLane.getAll();
+  const { lanes: apiLanes } = useLane.getAll();
   const { reorderTask } = useTask.reorder();
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const { lanes, moveTask } = useLanes();
   const [changedLaneIds, setChangedLaneIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -45,65 +25,63 @@ const RootPage = () => {
     return () => clearTimeout(timeout);
   }, [changedLaneIds]);
 
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
+  const handleOnDragEnd = useCallback<OnDragEndResponder>(
+    (result) => {
+      const sourceLaneId = result.source.droppableId;
+      const sourceIndex = result.source.index;
+      const targetLaneId = result.destination?.droppableId;
+      const targetIndex = result.destination?.index;
 
-    setActiveId(active.id);
-  };
+      if (
+        targetIndex === undefined ||
+        targetLaneId === undefined ||
+        (sourceIndex === targetIndex && sourceLaneId === targetLaneId)
+      )
+        return;
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+      const updatedLanes = moveTask(
+        sourceLaneId,
+        targetLaneId,
+        sourceIndex,
+        targetIndex
+      );
 
-    const current = (active.data.current as { task: TaskType }).task;
-    const target = (over!.data.current as { task: TaskType }).task;
+      const updatedSourceIndex = updatedLanes[targetLaneId].findIndex(
+        (t) => t.id === result.draggableId
+      );
+      const previousNodeId =
+        updatedLanes[targetLaneId][updatedSourceIndex - 1]?.id || null;
 
-    if (current.id === target.id) return;
-
-    reorderTask(
-      {
-        id: current.id,
-        payload: {
-          currentLaneId: current.laneId,
-          targetLaneId: target.laneId,
-          targetTaskId: target.id,
-          position: event.delta.y > 0 ? 'after' : 'before',
+      reorderTask(
+        {
+          id: result.draggableId,
+          payload: {
+            targetLaneId: targetLaneId,
+            previousNodeId,
+          },
         },
-      },
-      {
-        onSettled: () => {
-          setChangedLaneIds(() =>
-            current.laneId !== target.laneId
-              ? [current.laneId, target.laneId]
-              : [current.laneId]
-          );
-        },
-      }
-    );
-
-    setActiveId(null);
-  };
+        {
+          onSettled: () => {
+            setChangedLaneIds(() =>
+              sourceLaneId !== targetLaneId
+                ? [sourceLaneId, targetLaneId]
+                : [sourceLaneId]
+            );
+          },
+        }
+      );
+    },
+    [lanes]
+  );
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
+    <DragDropContext onDragEnd={handleOnDragEnd}>
       <div className="grid grid-cols-4 gap-3 w-full">
-        {lanes
+        {apiLanes
           ?.filter((l) => !['Backlog', 'Archive'].includes(l.name))
           .map((lane) => <Lane key={lane.id} id={lane.id} />)}
       </div>
-      {createPortal(
-        <DragOverlay>
-          {activeId ? (
-            <Task id={activeId as string} className="cursor-grab" />
-          ) : null}
-        </DragOverlay>,
-        document.body
-      )}
-    </DndContext>
+    </DragDropContext>
   );
 };
 

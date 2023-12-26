@@ -3,10 +3,8 @@ import { axios } from '@/api';
 import { TaskType } from '@/types';
 
 type UpdateTask = {
-  currentLaneId: string;
   targetLaneId: string;
-  targetTaskId: string;
-  position: 'before' | 'after';
+  previousNodeId: string | null;
 };
 
 type Variables = {
