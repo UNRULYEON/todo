@@ -73,7 +73,7 @@ router.patch(
   ClerkExpressRequireAuth(),
   validate(updateTaskSchema),
   async (req, res) => {
-    const subject = await db.task.findUnique({
+    const task = await db.task.findUnique({
       where: {
         id: req.params.id,
         lane: {
@@ -82,7 +82,17 @@ router.patch(
       },
     });
 
-    if (!subject) return res.sendStatus(404);
+    if (!task) return res.sendStatus(404);
+
+    await db.task.update({
+      where: {
+        id: task.id,
+      },
+      data: {
+        title: req.body.title,
+        description: req.body.description,
+      },
+    });
 
     return res.sendStatus(200);
   }
